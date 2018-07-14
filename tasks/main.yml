@@ -1,0 +1,48 @@
+- name: "downloadbin {{ db_name }} | Ensure bin directory"
+  file:
+    path: "{{ db_bin_dir }}"
+    state: directory
+    mode: "0755"
+    owner: root
+
+- name: "downloadbin {{ db_name }} | Ensure archive directory"
+  file:
+    path: "{{ db_archive_dir }}"
+    state: directory
+    mode: "0755"
+    owner: root
+  when: db_archived
+
+- name: "downloadbin {{ db_name }} | Check downloaded"
+  stat:
+    path: "{{ db_download_dest }}"
+  register: download_stats
+
+- name: "downloadbin {{ db_name }} | Download"
+  get_url:
+    url: "{{ db_url }}"
+    dest: "{{ db_download_dest }}"
+    force: yes
+    mode: "{{ db_archived | ternary('0444', '0555') }}"
+    checksum: "sha1:{{ db_sha1 }}"
+  when: not(download_stats.stat.checksum is defined and download_stats.stat.checksum == db_sha1)
+  notify: "{{ db_notify }}"
+
+- name: "downloadbin {{ db_name }} | Extract"
+  unarchive:
+    src: "{{ db_download_dest }}"
+    dest: "{{ db_bin_dir }}"
+    remote_src: yes
+    extra_opts: "{{ db_unarchive_extra_opts }}"
+  when: db_archived
+
+- name: "downloadbin {{ db_name }} | setcap"
+  command: "setcap {{ db_bin_setcap }} {{ db_bin_path }}"
+  when: db_bin_setcap != ""
+
+- name: "downloadbin {{ db_name }} | Link binary"
+  file:
+    src: "{{ db_bin_path }}"
+    dest: "{{ db_link_dest }}/{{ db_link_name }}"
+    state: link
+  when: db_link_dest != ""

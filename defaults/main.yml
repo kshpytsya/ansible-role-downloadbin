@@ -1,0 +1,13 @@
+db_archived: false
+db_archive_dir: "/opt/{{ db_name }}"
+db_bin_dir: "/opt/{{ db_name }}/bin"
+db_bin_path: "{{ db_bin_dir }}/{{ db_name }}"
+db_link_dest: /usr/bin
+db_link_name: "{{ db_name }}"
+
+# note: this can be a list. Set to [] to disable notification
+db_notify: "restart {{ db_name }}"
+db_bin_setcap: ""
+
+# E.g.: "--strip-components=1" for .tar.*, or "-j" for .zip
+db_unarchive_extra_opts: []

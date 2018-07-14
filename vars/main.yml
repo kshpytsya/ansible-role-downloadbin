@@ -1,0 +1,2 @@
+db_download_dest: "{{ db_archived | ternary(db_archive_dir + '/' + db_url_basename, db_bin_path) }}"
+db_url_basename: "{{ db_url | basename }}"
