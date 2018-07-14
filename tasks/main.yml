@@ -23,7 +23,7 @@
     url: "{{ db_url }}"
     dest: "{{ db_download_dest }}"
     force: yes
-    mode: "{{ db_archived | ternary('0444', '0555') }}"
+    mode: "{{ db_mode }}"
     checksum: "sha1:{{ db_sha1 }}"
   when: not(download_stats.stat.checksum is defined and download_stats.stat.checksum == db_sha1)
   notify: "{{ db_notify }}"

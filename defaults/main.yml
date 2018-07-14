@@ -4,6 +4,7 @@ db_bin_dir: "/opt/{{ db_name }}/bin"
 db_bin_path: "{{ db_bin_dir }}/{{ db_name }}"
 db_link_dest: /usr/bin
 db_link_name: "{{ db_name }}"
+db_mode: "{{ db_archived | ternary('0444', '0555') }}"
 
 # note: this can be a list. Set to [] to disable notification
 db_notify: "restart {{ db_name }}"
