@@ -45,4 +45,4 @@
     src: "{{ db_bin_path }}"
     dest: "{{ db_link_dest }}/{{ db_link_name }}"
     state: link
-  when: db_link_dest != ""
+  when: not((db_link_dest | trim == "") or (db_link_dest is none))
