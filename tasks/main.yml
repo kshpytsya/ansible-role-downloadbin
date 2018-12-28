@@ -11,7 +11,7 @@
     state: directory
     mode: "0755"
     owner: root
-  when: db_archived
+  when: db_archived | bool
 
 - name: "downloadbin {{ db_name }} | Check downloaded"
   stat:
@@ -34,7 +34,7 @@
     dest: "{{ db_bin_dir }}"
     remote_src: yes
     extra_opts: "{{ db_unarchive_extra_opts }}"
-  when: db_archived
+  when: db_archived | bool
 
 - name: "downloadbin {{ db_name }} | setcap"
   command: "setcap {{ db_bin_setcap }} {{ db_bin_path }}"
