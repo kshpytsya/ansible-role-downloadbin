@@ -1,48 +1,48 @@
-- name: "downloadbin {{ db_name }} | Ensure bin directory"
+- name: "downloadbin {{ db__opts_name }} | Ensure bin directory"
   file:
-    path: "{{ db_bin_dir }}"
+    path: "{{ db__opts_bin_dir }}"
     state: directory
     mode: "0755"
     owner: root
 
-- name: "downloadbin {{ db_name }} | Ensure archive directory"
+- name: "downloadbin {{ db__opts_name }} | Ensure archive directory"
   file:
-    path: "{{ db_archive_dir }}"
+    path: "{{ db__opts_archive_dir }}"
     state: directory
     mode: "0755"
     owner: root
-  when: db_archived | bool
+  when: db__opts_archived
 
-- name: "downloadbin {{ db_name }} | Check downloaded"
+- name: "downloadbin {{ db__opts_name }} | Check downloaded"
   stat:
-    path: "{{ db_download_dest }}"
-  register: download_stats
+    path: "{{ db__download_dest }}"
+  register: db__download_stats
 
-- name: "downloadbin {{ db_name }} | Download"
+- name: "downloadbin {{ db__opts_name }} | Download"
   get_url:
-    url: "{{ db_url }}"
-    dest: "{{ db_download_dest }}"
+    url: "{{ db__opts_url }}"
+    dest: "{{ db__download_dest }}"
     force: yes
-    mode: "{{ db_mode }}"
-    checksum: "sha1:{{ db_sha1 }}"
-  when: not(download_stats.stat.checksum is defined and download_stats.stat.checksum == db_sha1)
-  notify: "{{ db_notify }}"
+    mode: "{{ db__opts_mode }}"
+    checksum: "sha1:{{ db__opts_sha1 }}"
+  when: not(db__download_stats.stat.checksum is defined and db__download_stats.stat.checksum == db__opts_sha1)
+  notify: "{{ db__opts_notify }}"
 
-- name: "downloadbin {{ db_name }} | Extract"
+- name: "downloadbin {{ db__opts_name }} | Extract"
   unarchive:
-    src: "{{ db_download_dest }}"
-    dest: "{{ db_bin_dir }}"
+    src: "{{ db__download_dest }}"
+    dest: "{{ db__opts_bin_dir }}"
     remote_src: yes
-    extra_opts: "{{ db_unarchive_extra_opts }}"
-  when: db_archived | bool
+    extra_opts: "{{ db__opts_unarchive_extra_opts }}"
+  when: db__opts_archived
 
-- name: "downloadbin {{ db_name }} | setcap"
-  command: "setcap {{ db_bin_setcap }} {{ db_bin_path }}"
-  when: db_bin_setcap != ""
+- name: "downloadbin {{ db__opts_name }} | setcap"
+  command: "setcap {{ db__opts_bin_setcap }} {{ db__opts_bin_path }}"
+  when: db__opts_bin_setcap != ""
 
-- name: "downloadbin {{ db_name }} | Link binary"
+- name: "downloadbin {{ db__opts_name }} | Link binary"
   file:
-    src: "{{ db_bin_path }}"
-    dest: "{{ db_link_dest }}/{{ db_link_name }}"
+    src: "{{ db__opts_bin_path }}"
+    dest: "{{ db__opts_link_dest }}/{{ db__opts_link_name }}"
     state: link
-  when: not((db_link_dest | trim == "") or (db_link_dest is none))
+  when: not((db__opts_link_dest | trim == "") or (db__opts_link_dest is none))

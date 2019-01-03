@@ -1,2 +1,28 @@
-db_download_dest: "{{ db_archived | ternary(db_archive_dir + '/' + db_url_basename, db_bin_path) }}"
-db_url_basename: "{{ db_url | basename }}"
+# required options
+db__opts_name: "{{ db_opts.name }}"
+db__opts_url: "{{ db_opts.url }}"
+db__opts_sha1: "{{ db_opts.sha1 }}"
+
+# optional options
+db__opts_archived: "{{ db_opts.archived | default(false) }}"
+db__opts_archive_dir: "{{ db_opts.archive_dir | default('/opt/{}'.format(db__opts_name)) }}"
+db__opts_bin_dir: "{{ db_opts.bin_dir | default('/opt/{}/bin'.format(db__opts_name)) }}"
+db__opts_bin_path: "{{ db_opts.bin_path |
+                         default('{}/{}{}'.format(db__opts_bin_dir, db__opts_name, db__opts_bin_suffix)) }}"
+db__opts_bin_suffix: "{{ db_opts.bin_suffix | default('') }}"
+db__opts_link_dest: "{{ db_opts.link_dest | default('/usr/bin') }}"
+db__opts_link_name: "{{ db_opts.link_name | default(db__opts_name) }}"
+db__opts_mode: "{{ db_opts.mode | default(db__opts_archived | ternary('0444', '0555')) }}"
+
+# note: this can be a list. Set to [] to disable notification
+db__opts_notify: "{{ db_opts.notify | default('restart {}'.format(db__opts_name)) }}"
+db__opts_bin_setcap: "{{ db_opts.bin_setcap | default('') }}"
+
+# E.g.: "--strip-components=1" for .tar.*, or "-j" for .zip
+db__opts_unarchive_extra_opts: "{{ db_opts.unarchive_extra_opts | default([]) }}"
+
+# derrived variables
+db__download_dest: "{{ db__opts_archived | ternary(
+                         db__opts_archive_dir + '/' + (db__opts_url | basename),
+                         db__opts_bin_path)
+                    }}"
